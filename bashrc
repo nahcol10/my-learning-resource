@@ -1,15 +1,44 @@
-# ~/.bashrc - Minimal ML (.venv focused)
+# ~/.bashrc 
 
+# Source system-wide config
 [[ -f /etc/bashrc ]] && . /etc/bashrc
+
+# PATH: Ensure user-local binaries are prioritized
 [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
-shopt -s checkwinsize autocd histappend
-HISTSIZE=30000; HISTFILESIZE=60000
+# Shell Options (Built-in, zero overhead)
+shopt -s checkwinsize autocd histappend cdspell dirspell checkjobs extglob
 
-if ! shopt -oq posix && [[ -f /usr/share/bash-completion/bash_completion ]]; then
-  . /usr/share/bash-completion/bash_completion
+# History Configuration
+HISTSIZE=30000
+HISTFILESIZE=60000
+HISTCONTROL=ignoreboth:erasedups
+HISTTIMEFORMAT='%F %T '
+HISTIGNORE="&:[bf]g:exit:reset:clear:cd .."
+
+# Bash Completion (Native & lightweight)
+if ! shopt -oq posix; then
+  [[ -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion
+  [[ -f /etc/bash_completion ]] && . /etc/bash_completion
 fi
 
+# Readline / Terminal UX Tweaks
+bind 'set completion-ignore-case on'
+bind 'set show-all-if-ambiguous on'
+bind 'set skip-completed-text on'
+bind 'set bell-style none'
+bind '"\C-j": accept-line'  # Force Ctrl+J to execute line (no multiline)
+
+# Minimal, High-Value Aliases
+alias ls='ls --color=auto'
+alias ll='ls -lah --color=auto'
+alias la='ls -A --color=auto'
+alias grep='grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias cls='clear'
+
+# Lightweight Custom Prompt (Preserved & Optimized)
 __prompt() {
   local ec=$? prefix="" git_info=""
   (( ec != 0 )) && prefix="\[\033[38;5;203m\][$ec]\[\033[0m\] "
@@ -27,15 +56,5 @@ __prompt() {
 }
 PROMPT_COMMAND=__prompt
 
-# Fixed: correct semicolons for 256-color codes, colons only as separators
+# 256-Color LS_COLORS (Unchanged)
 export LS_COLORS="di=38;5;51:ln=38;5;226:ex=38;5;118:*.sh=38;5;118:*.py=38;5;45:*.js=38;5;226:*.ts=38;5;226:*.json=38;5;214:*.md=38;5;231:*.txt=38;5;231:*.html=38;5;207:*.css=38;5;207:*.scss=38;5;207:*.env=38;5;196:*.lock=38;5;248:*.log=38;5;248:*.zip=38;5;201:*.tar=38;5;201:*.gz=38;5;201:*.png=38;5;135:*.jpg=38;5;135:*.jpeg=38;5;135:*.svg=38;5;135:*.gif=38;5;135:*.mp4=38;5;213:*.mp3=38;5;213:so=38;5;196:pi=38;5;196:"
-alias ls='ls --color=auto' ll='ls -lah --color=auto' la='ls -A --color=auto'
-
-if [[ $- == *i* && -f ~/.local/share/blesh/ble.sh ]]; then
-  source ~/.local/share/blesh/ble.sh --noattach 2>/dev/null && {
-    bleopt complete_auto_delay=0 complete_auto_complete=1 history_share=1
-    ble-face menu_complete_selected='fg=117,bold' menu_filter_fixed='fg=183'
-    ble-face syntax_command='fg=114' syntax_error='fg=203'
-    ble-attach
-  }
-fi
