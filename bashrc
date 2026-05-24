@@ -27,7 +27,7 @@ bind 'set completion-ignore-case on'
 bind 'set show-all-if-ambiguous on'
 bind 'set skip-completed-text on'
 bind 'set bell-style none'
-bind '"\C-j": accept-line'  # Force Ctrl+J to execute line (no multiline)
+bind '"\C-o": accept-line'  # Force Ctrl+o to execute line (no multiline)
 
 # Minimal, High-Value Aliases
 alias ls='ls --color=auto'
